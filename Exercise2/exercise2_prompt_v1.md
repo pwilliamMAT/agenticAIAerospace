@@ -1,0 +1,3 @@
+ASR-12-WorkshopRadar.pdf contains the parameters of an airport surveillance radar. Extract the file text and then create "characterizeRadar.m" which plots SNR vs Range of the radar based on its parameters. Avoid creating excess files. Work carefully, and double check the results. 
+
+Once radar characterization is in place, create a second script "ASR12_dataGenerator.m" that contains a function call to generate radar detections data. In future work, I plan to use this radar data generation within a radar scenario in MATLAB. The data generation script should be simple, with parameters inline as much as possible to avoid bloat.

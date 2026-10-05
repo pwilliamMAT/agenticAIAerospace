@@ -1,0 +1,5 @@
+ASR-12-WorkshopRadar.pdf contains the parameters of an airport surveillance radar. Extract the file text and then create "characterizeRadar.m" which plots SNR vs Range of the radar based on its parameters using the "radarmetricsplot" function. Make sure the plot has colored regions for pass and fail criteria. Make sure the plot displays our range requirements. Avoid creating excess files. 
+
+Once radar characterization is in place, create a second script "dataGenerator.m" that contains a function call to generate radar detections data, using the "radarDataGenerator" function. In future work, I plan to use this radar data generation within a radar scenario in MATLAB. The data generation script should be simple, with parameters inline as much as possible to avoid bloat. Do not create the scenario, just create the "radarDataGenerator" call for me to later integrate. 
+
+Work sequentially, think carefully, and double check your results using MCP. Once complete, give a summary of what you did.
