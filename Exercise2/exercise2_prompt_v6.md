@@ -26,6 +26,7 @@ MATLAB scripts in this folder.
    - Include brief printed diagnostics
    - Verify numerically that the printed values and plotted curve share the
      same dB convention.
+   - Reminder the SNR plot functions create a figure for you, you do not need to call "figure" first.
 2. Then create `dataGenerator.m`.
    - Create one minimal inline `radarDataGenerator` configuration using the
      same PDF-derived values. Do not create a radar scenario.
@@ -39,6 +40,7 @@ Implementation guidance:
 - Work sequentially and avoid extra files.
 - Double-check Radar Toolbox APIs and their output units with MATLAB MCP
   before finalizing.
+- Do not feel the need to include assert statements within the code.
 - Run static analysis and both scripts in MATLAB after writing them.
 - Inspect the resulting SNR figure through MATLAB: confirm that stoplight
   regions are present, the x-axis reaches at least 500 km, and the vertical
