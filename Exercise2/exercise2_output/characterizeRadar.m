@@ -6,7 +6,8 @@
 clear; clc;
 
 scriptFolder = fileparts(mfilename("fullpath"));
-pdfFile = fullfile(scriptFolder, "ASR-12-WorkshopRadar.pdf");
+exercise2Folder = fileparts(scriptFolder);
+pdfFile = fullfile(exercise2Folder, "ASR-12-WorkshopRadar.pdf");
 pdfText = char(extractFileText(pdfFile));
 pdfText = regexprep(pdfText, char(160), " ");
 
