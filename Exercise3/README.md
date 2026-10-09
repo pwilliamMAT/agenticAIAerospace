@@ -15,7 +15,7 @@ Run `Exercise3_WideAreaSurveillance.m` in the MATLAB Live Editor to inspect and 
 
 ## Setup
 
-Exercise 2 output is in a different location.  Find it in the Exercise2 folder in the top level: `~/Exercise2?exercise2Output/createCharacterizedRadar.m`.
+Exercise 2 output is in a different location.  Find it in the Exercise2 folder in the top level: `../Exercise2?exercise2Output/createCharacterizedRadar.m`.
 
 ## Part A — Explore
 
