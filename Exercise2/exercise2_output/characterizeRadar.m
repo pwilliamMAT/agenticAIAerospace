@@ -1,64 +1,66 @@
-%characterizeRadar Characterize the ASR-12 training radar from its datasheet.
+%% characterizeRadar
+% Monostatic surveillance-radar range/SNR characterization from the
+% companion SurveillanceRadar.pdf training datasheet.
 
-pdfText = extractFileText(fullfile(pwd,"ASR-12-WorkshopRadar.pdf"));
-requiredText = ["2.80 GHz" "1.10 MW" "325 Hz" "2.15 us" ...
-    "37.21 dBi" "4.0 dB" "6.0 dB" "10 m2" "0-444 km"];
-if ~all(contains(pdfText,requiredText))
-    error("ASR-12-WorkshopRadar.pdf does not contain the expected training parameters.")
+scriptFolder = fileparts(mfilename("fullpath"));
+pdfPath = fullfile(fileparts(scriptFolder),"SurveillanceRadar.pdf");
+extractLogPath = fullfile(pwd,"SurveillanceRadar.log");
+removeExtractLog = ~isfile(extractLogPath);
+datasheetText = extractFileText(pdfPath);
+if removeExtractLog && isfile(extractLogPath)
+    delete(extractLogPath); % Remove the extraction by-product, if MATLAB creates it.
 end
+assert(contains(datasheetText,"Surveillance Radar"), ...
+    "The expected SurveillanceRadar.pdf datasheet was not found.");
 
-speedOfLight = physconst("LightSpeed");
-carrierFrequency = 2.80e9;          % Datasheet: 2.80 GHz
-peakTransmitPower = 1.10e6;         % Datasheet: 1.10 MW
-pulseWidth = 2.15e-6;               % Datasheet: 2.15 us
-antennaGain = 37.21;                % Datasheet: 37.21 dBi
-noiseFigure = 4.0;                  % Datasheet: 4.0 dB
-systemLoss = 6.0;                   % Datasheet: 6.0 dB
-targetRCS = 10;                     % Datasheet: 10 m^2
-instrumentedRange = 444e3;          % Datasheet: 444 km (reporting range)
-evaluationRange = 463e3;            % Exercise evaluation point: 463 km
-pd = 0.90;                          % Datasheet detection assumption
-pfa = 1e-6;                         % Datasheet false-alarm assumption
+% Selected datasheet values, converted to SI units where applicable.
+c = physconst("LightSpeed");          % m/s
+carrierFrequency = 2.9e9;             % 2.9 GHz nominal carrier, Hz
+wavelength = c/carrierFrequency;      % m
+peakPower = 750e3;                    % 750 kW peak transmit power, W
+pulseWidth = 2.15e-6;                 % 2.15 us pulse width, s
+antennaGain = 37;                     % 37 dBi peak gain, dB
+noiseFigure = 4;                      % 4 dB receiver noise figure, dB
+systemTemperature = 290*db2pow(noiseFigure); % Reference-temperature equivalent, K
+systemLoss = 6;                       % 6 dB end-to-end system loss, dB
+targetRCS = 10;                       % Representative exercise target, m^2
 
-wavelength = speedOfLight/carrierFrequency;
-systemTemperature = 290*db2pow(noiseFigure); % 290 K antenna, NF converted to K
-detectorProcessingLoss = 0;         % Explicit selection: no added detector loss
-cfarLoss = 0;                       % Omitted: no CFAR-loss model selected
-numberOfCoherentPulses = 20;        % Explicit electronic-dwell assumption
+probabilityDetection = 0.90;          % Exercise detection requirement
+probabilityFalseAlarm = 1e-6;         % Exercise false-alarm requirement
+numberCoherentPulses = 20;            % Pulses integrated while on target
+evaluationRange = 463e3;              % Required SNR evaluation range, m
 
-rangeM = (1e3:1e3:500e3).';
-rangeKm = rangeM/1e3;
-singlePulseSnr = radareqsnr(wavelength,rangeM,peakTransmitPower,pulseWidth, ...
+range = linspace(1e3,600e3,1000).';   % Plot past 500 km, m
+singlePulseSnr = radareqsnr(wavelength,range,peakPower,pulseWidth, ...
     RCS=targetRCS,Ts=systemTemperature,Gain=antennaGain,Loss=systemLoss);
-integratedSnr = singlePulseSnr + pow2db(numberOfCoherentPulses);
-requiredSnr = detectability(pd,pfa) + detectorProcessingLoss;
+singlePulseSnrDb = singlePulseSnr;    % radareqsnr returns SNR directly in dB.
+electronicDwellSnrDb = singlePulseSnrDb + pow2db(numberCoherentPulses);
 
-singlePulseAtEvaluation = radareqsnr(wavelength,evaluationRange, ...
-    peakTransmitPower,pulseWidth,RCS=targetRCS,Ts=systemTemperature, ...
-    Gain=antennaGain,Loss=systemLoss);
-curveAtEvaluation = singlePulseSnr(rangeM == evaluationRange);
-integratedAtEvaluation = singlePulseAtEvaluation + pow2db(numberOfCoherentPulses);
+% Detection threshold is independent of the plotted system-loss/gain accounting.
+detectionRequirementDb = pow2db(detectability(probabilityDetection, ...
+    probabilityFalseAlarm));
 
-fprintf("ASR-12 training radar: instrumented reporting range = %.0f km; evaluation point = %.0f km.\n", ...
-    instrumentedRange/1e3,evaluationRange/1e3);
-fprintf("System temperature = %.1f K from 4.0 dB NF; system loss = %.1f dB and is included once in radareqsnr.\n", ...
-    systemTemperature,systemLoss);
-fprintf("Pd = %.2f, Pfa = %.1e: detectability requirement = %.2f dB; detector-processing loss = %.1f dB.\n", ...
-    pd,pfa,requiredSnr,detectorProcessingLoss);
-fprintf("CFAR loss is omitted (no CFAR model or value selected).\n");
-fprintf("At %.0f km: 1-pulse SNR = %.2f dB, 20-pulse electronic-dwell SNR = %.2f dB.\n", ...
-    evaluationRange/1e3,singlePulseAtEvaluation,integratedAtEvaluation);
-fprintf("Curve/direct 1-pulse check at %.0f km = %.3g dB; all plotted SNR values are dB.\n", ...
-    evaluationRange/1e3,curveAtEvaluation-singlePulseAtEvaluation);
+evaluationSnr = radareqsnr(wavelength,evaluationRange,peakPower,pulseWidth, ...
+    RCS=targetRCS,Ts=systemTemperature,Gain=antennaGain,Loss=systemLoss);
+evaluationSnrDb = evaluationSnr;
+plottedEvaluationSnrDb = interp1(range,singlePulseSnrDb,evaluationRange,"linear");
+assert(abs(evaluationSnrDb-plottedEvaluationSnrDb) < 0.01, ...
+    "The evaluation SNR and plotted curve do not use the same dB convention.");
 
-ax = radarmetricplot(rangeKm,singlePulseSnr,requiredSnr,requiredSnr, ...
-    'MaxRangeRequirement',evaluationRange/1e3,'ShowStoplight',true, ...
-    'RadarName',{'ASR-12'},'MetricName',"Available SNR (1 pulse)", ...
-    'RequirementName',"Pd = 0.90, Pfa = 10^{-6}",'RangeUnit',"km",'MetricUnit',"dB");
-title(ax,"Single-pulse detection opportunity")
+% radarmetricplot creates and owns its figure; range values are kilometres.
+rangeKm = range/1e3;
+evaluationRangeKm = evaluationRange/1e3;
+metricAxes = radarmetricplot(rangeKm, ...
+    [singlePulseSnrDb,electronicDwellSnrDb],detectionRequirementDb, ...
+    ShowStoplight=true,MaxRangeRequirement=evaluationRangeKm, ...
+    RadarName=["Single-pulse available SNR","20-pulse electronic dwell SNR"], ...
+    MetricName="Available SNR",MetricUnit="dB", ...
+    RequirementName="Pd = 0.90, Pfa = 10^{-6} detection requirement", ...
+    RangeUnit="km");
+xline(metricAxes,evaluationRangeKm,"k--","463 km evaluation requirement", ...
+    LabelVerticalAlignment="bottom",LabelHorizontalAlignment="center");
 
-ax = radarmetricplot(rangeKm,integratedSnr,requiredSnr,requiredSnr, ...
-    'MaxRangeRequirement',evaluationRange/1e3,'ShowStoplight',true, ...
-    'RadarName',{'ASR-12'},'MetricName',"Integrated available SNR (dB)", ...
-    'RequirementName',"Pd = 0.90, Pfa = 10^{-6}",'RangeUnit',"km",'MetricUnit',"dB");
-title(ax,"Electronic dwell: 20 coherent pulses on target")
+fprintf("Single-pulse SNR at 463 km: %.2f dB\n",evaluationSnrDb);
+fprintf("20-pulse electronic-dwell SNR at 463 km: %.2f dB\n", ...
+    evaluationSnrDb + pow2db(numberCoherentPulses));
+fprintf("Detection requirement: %.2f dB\n",detectionRequirementDb);

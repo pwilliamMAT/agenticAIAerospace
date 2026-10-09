@@ -1,20 +1,22 @@
-%dataGenerator Create a reusable ASR-12 training radar detection generator.
+%% dataGenerator
+% Reusable radarDataGenerator configured from SurveillanceRadar.pdf values.
 
 radar = radarDataGenerator(1, ...
-    UpdateRate=1.0, ...                         % Datasheet: 1.0 s update interval
-    ScanMode="Mechanical", ...
-    MaxAzimuthScanRate=360, ...                 % Datasheet: 60 rpm
-    MechanicalAzimuthLimits=[0 360], ...        % Datasheet: 360 deg coverage
+    UpdateRate=1, ...                              % 1 Hz reporting update
+    ScanMode="Mechanical and electronic", ...
+    MechanicalAzimuthLimits=[-180 180], ...        % 360 deg mechanical coverage
+    ElectronicElevationLimits=[-10 10], ...        % Centered 20 deg elevation sector
+    FieldOfView=[30 20], ...                        % [azimuth elevation], deg
     HasElevation=true, ...
-    HasRangeAmbiguities=true, ...
-    CenterFrequency=2.80e9, ...                 % Datasheet: 2.80 GHz
-    Bandwidth=1/2.15e-6, ...                    % Datasheet pulse width: 2.15 us
+    HasRangeRate=true, ...
+    HasRangeAmbiguities=true, ...                   % Enables the 500 km ambiguity model
+    AzimuthResolution=2.8, ...                      % Datasheet reporting resolution, deg
+    ElevationResolution=2.23, ...                   % Datasheet reporting resolution, deg
+    RangeResolution=323, ...                        % Datasheet reporting resolution, m
+    RangeRateResolution=100, ...                    % Datasheet reporting resolution, m/s
     DetectionProbability=0.90, ...
     FalseAlarmRate=1e-6, ...
-    ReferenceRange=444e3, ...                   % Datasheet: 444 km instrumented range
-    ReferenceRCS=10, ...                        % Datasheet: 10 m^2 = 10 dBsm
-    FieldOfView=[1.4 4.5], ...                  % Datasheet: azimuth/elevation beamwidths (deg)
-    AzimuthResolution=0.176, ...                % Datasheet exercise accuracy (deg)
-    RangeResolution=323, ...                    % Datasheet nominal resolution (m)
-    RangeLimits=[0 444e3], ...
-    MaxUnambiguousRange=461e3);                 % Datasheet: 461 km; ambiguity enabled above
+    ReferenceRange=463e3, ...                       % Exercise evaluation range, m
+    ReferenceRCS=pow2db(10), ...                    % Representative 10 m^2 target, dBsm
+    RangeLimits=[0 500e3], ...                      % Datasheet nominal unambiguous span, m
+    MaxUnambiguousRange=500e3);
