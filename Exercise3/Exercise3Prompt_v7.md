@@ -1,16 +1,24 @@
 # Exercise 3 Prompt
 
+Work in the active exercise copy. Repository authors use `Exercise3_Test3`
+for local trials and retain `Exercise3` as the published starting materials.
+Call `paths = setupExercise3()` before inspection; setup requires only the
+supplied files, not the solution you are about to build.
+
 Inspect the Exercise3_WideAreaSurveillance.m exercise in this folder and the
-radar dataGenerator.m file in 
-"/MATLAB Drive/agenticaiaerospace/Exercise2/exercise2_output/"
+radar dataGenerator.m file in `../Exercise2/`.
 
 Create a new runnable version of the surveillance simulation that uses the 
 characterized radar from exercise 2 for the three stationary ground-radar 
 sites. Retain the airborne radars as they are and maintain the original 
 scenario intent.
 
-Make sure the new script adds the path to the "exercise2_output" folder so 
-that running the new script can find the radar file from Exercise 2.
+Start the new script with `paths = setupExercise3()`. This resolves the
+Exercise 2 output folder and checks that the correct Exercise 3 helpers are
+selected. Run `paths.RadarFile`; it creates the variable `radar`.
+Use these resolved paths on desktop MATLAB and MATLAB Online. Do not use
+machine-specific paths, `tempdir`, or `pwd` for persistent inputs or outputs.
+Keep `mfilename` inside regular helper functions, not the Live Script.
 
 The radarDataGenerator Object that is output by Exercise 2 does not specify 
 the "DetectionCoordinates".  Make sure to update this radarDataGenerator to 
@@ -21,8 +29,13 @@ plain-text .m file that begins with the required  %\[text] # Exercise 3
 title form and use the MATLAB Live Script guidance to validate the exact 
 syntax before editing.
 
-In the final version of the file, do not rerun the original simulation. 
-Load the data from the original simulation.
+Load the supplied baseline with
+`[baselineResults, baselineMetadata] = helperLoadExercise3Baseline(paths.BaselineFile)`.
+This MAT-file is already distributed in Exercise3 and contains Time, OSPA,
+SensorDataLog, TruthDataLog, and separate provenance metadata. Do not rerun
+the original simulation or generate baseline data during the participant
+workflow. If it is missing or invalid, report the author preparation command
+from README.md. Never replace the supplied baseline with a diagnostic run.
 
 In the final version of the file, when the updated version of the simulation 
 runs, make sure the trackingGlobeViewer is shown and the metric plot updates 
@@ -96,7 +109,7 @@ partial execution whenever possible.
 dynamically updates the OSPA for the simulation with new radar configuration 
 as the simulation runs
 2. One summary table
-3. One visualization image
+3. One visualization image saved to `paths.ComparisonImageFile`
 
 Do not recreate every figure or screenshot from the original example.
 
@@ -106,6 +119,10 @@ Do not recreate every figure or screenshot from the original example.
 * verify detection generation
 * verify tracker execution on a small subset of frames
 * execute the full scenario once for final results
+* after building the solution, verify a clean-workspace run using
+  `run(fullfile(paths.Exercise3Folder, "Exercise3_CharacterizedWideAreaSurveillance.m"))`,
+  or use `run_matlab_file` with that full script path; do not hard-code a different exercise copy
+* confirm the original baseline file remains unchanged
 
 # At the end summarize:
 

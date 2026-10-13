@@ -8,3 +8,9 @@
 /Exercise3/Exercise3Prompt_v5.md
 /Exercise3/Exercise3Prompt_v6.md
 /Exercise3_OriginalBaselineResults.mat
+
+# The full baseline beside the exercise is a distributed workshop input.
+!/Exercise3/Exercise3_OriginalBaselineResults.mat
+
+# Recreated by the characterized Live Script.
+/Exercise3/exercise3_characterized_ospa_comparison.png

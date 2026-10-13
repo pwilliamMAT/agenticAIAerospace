@@ -67,7 +67,10 @@ radar = createAirborneRadar(5);
 platform(scene,'Trajectory',geoTrajectory(wp,time,"ReferenceFrame","ENU"),'Sensors',{radar},'Signatures',...
     rcsSignature('Pattern',10));
 
-load('dWideAreaSurveillanceTargetWaypoints.mat','tgts');
+waypointFile = fullfile(fileparts(mfilename("fullpath")), ...
+    "dWideAreaSurveillanceTargetWaypoints.mat");
+waypointData = load(waypointFile, "tgts");
+tgts = waypointData.tgts;
 
 for i = 1:numel(tgts)
     wp = tgts(i).Position;
