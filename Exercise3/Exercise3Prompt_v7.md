@@ -9,8 +9,12 @@ characterized radar from exercise 2 for the three stationary ground-radar
 sites. Retain the airborne radars as they are and maintain the original 
 scenario intent.
 
-Make sure the new script adds the path to the "exercise2Output" folder so 
+Make sure the new script adds the path to the "exercise2_output" folder so 
 that running the new script can find the radar file from Exercise 2.
+
+The radarDataGenerator Object that is output by Exercise 2 does not specify 
+the "DetectionCoordinates".  Make sure to update this radarDataGenerator to 
+report detections in "Sensor spherical" to be compatible with this scenario.
 
 The output file MUST be a LiveScript formatted file. Keep it as a 
 plain-text .m file that begins with the required  %\[text] # Exercise 3 
@@ -27,7 +31,9 @@ dynamically in its own window.
 The metrics visualization MUST show the baseline in default blue and the new 
 configuration's metrics should be plotted with orange/red.
 
-Do not overwrite the original files or the Exercise 2 output.
+Do not overwrite the original files or the Exercise 2 output. You can change 
+the radarDataGenerator parameters once the object is instantiated within the 
+new script.
 
 # Formatting requirements for MATLAB Online:
 ````
