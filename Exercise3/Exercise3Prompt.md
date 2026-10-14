@@ -1,12 +1,21 @@
 # Exercise 3 Prompt
 
-Work in the active exercise copy. Repository authors use `Exercise3_Test3`
-for local trials and retain `Exercise3` as the published starting materials.
-Call `paths = setupExercise3()` before inspection; setup requires only the
-supplied files, not the solution you are about to build.
+Work in this exercise folder. Read `agentChecks.md`, then call
+`paths = setupExercise3()` before inspection. Setup checks the supplied
+files and selects `helperFunctions`; it does not require or create the
+solution you are about to build.
 
-Inspect the Exercise3_WideAreaSurveillance.m exercise in this folder and the
-radar dataGenerator.m file in `../Exercise2/`.
+Inspect the original Live Script at `paths.BaselineScript`, its supporting
+code in `paths.HelperFunctionsFolder`, and the Exercise 2 radar producer
+at `paths.RadarFile` (`../Exercise2/exercise2_output/dataGenerator.m`).
+When reading plain-text Live Scripts, stop at the line beginning `%[appendix]`.
+
+The original script, baseline MAT-file, and existing support functions are
+supplied inputs. Create `Exercise3_CharacterizedWideAreaSurveillance.m` in
+`paths.Exercise3Folder`, place any new helper functions in
+`paths.HelperFunctionsFolder`, and save the requested image to
+`paths.ComparisonImageFile`. Do not overwrite supplied files. A generated
+comparison helper is part of your solution, not an existing prerequisite.
 
 Create a new runnable version of the surveillance simulation that uses the 
 characterized radar from exercise 2 for the three stationary ground-radar 
@@ -20,18 +29,19 @@ Use these resolved paths on desktop MATLAB and MATLAB Online. Do not use
 machine-specific paths, `tempdir`, or `pwd` for persistent inputs or outputs.
 Keep `mfilename` inside regular helper functions, not the Live Script.
 
-The radarDataGenerator Object that is output by Exercise 2 does not specify 
-the "DetectionCoordinates".  Make sure to update this radarDataGenerator to 
-report detections in "Sensor spherical" to be compatible with this scenario.
+Set the instantiated Exercise 2 `radarDataGenerator` object's
+`DetectionCoordinates` to `"Sensor spherical"` for compatibility with this
+scenario. Check its elevation and range-rate support against the supplied
+scenario and tracker before running it.
 
 The output file MUST be a LiveScript formatted file. Keep it as a 
-plain-text .m file that begins with the required  %\[text] # Exercise 3 
+plain-text .m file that begins with `%[text] # Exercise 3`
 title form and use the MATLAB Live Script guidance to validate the exact 
 syntax before editing.
 
 Load the supplied baseline with
 `[baselineResults, baselineMetadata] = helperLoadExercise3Baseline(paths.BaselineFile)`.
-This MAT-file is already distributed in Exercise3 and contains Time, OSPA,
+This MAT-file is supplied at the exercise root and contains Time, OSPA,
 SensorDataLog, TruthDataLog, and separate provenance metadata. Do not rerun
 the original simulation or generate baseline data during the participant
 workflow. If it is missing or invalid, report the author preparation command
@@ -49,7 +59,6 @@ the radarDataGenerator parameters once the object is instantiated within the
 new script.
 
 # Formatting requirements for MATLAB Online:
-````
 The live `trackingGlobeViewer` and the dynamically updating metrics plot must be easy to watch together in MATLAB Online on a laptop screen. Err on the side of smaller windows: it is acceptable for the windows to leave unused browser workspace, but it is not acceptable for either window to be near full-screen, clipped by the MATLAB Online browser chrome, hidden behind another window, or difficult to resize because an edge is inaccessible.
 
 Do not rely on MATLAB's default figure or axes sizes. Explicitly size and position both `uifigure` windows using normalized units so the layout adapts to the available MATLAB Online browser workspace. Keep both windows comfortably inside the browser workspace with visible margins on all sides. Place the tracking viewer on the left and the metrics window on the right. The viewer should be larger than the metrics window, but both should be deliberately conservative in size.
@@ -66,7 +75,7 @@ metricFigure = uifigure( ...
     Units="normalized", ...
     Position=[0.42 0.58 0.24 0.22], ...
     Name="Live OSPA Metric Comparison");
-````
+```
 
 Hard maximums: the viewer window width must not exceed `0.40`, viewer height must not exceed `0.42`, metrics window width must not exceed `0.26`, and metrics window height must not exceed `0.24`. The right edge of the metrics window should be at or left of `0.70`, not near `1.0`, because MATLAB Online often has right-side panels open. The bottom edge of every window should be at or above `0.25`, so MATLAB Online status bars and docked panels do not cover the resize handles.
 
@@ -97,6 +106,8 @@ Keep labels, title, grid, and legend readable but compact. Use a compact font si
 objects are created.
 * Preserve the existing tracker configuration.
 * Regenerate detections using the characterized radar.
+* Make section reruns safe: clear the characterized animated line before
+starting a new run so it cannot connect the previous endpoint back to time zero.
 * During development, use shortened runs, reduced frame counts, or
 partial execution whenever possible.
 * Validate code incrementally through MATLAB MCP.
