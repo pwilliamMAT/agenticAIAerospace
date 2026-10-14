@@ -25,7 +25,7 @@ Use these defaults for this Exercise 3 workshop session unless the user explicit
 
 ## Fast Workflow
 
-1. Start in this exercise folder and read `Exercise3Prompt_v7.md`. Inspect only the useful portion of Live Scripts before the line beginning `%[appendix]`.
+1. Start in this exercise folder and read `Exercise3Prompt.md`. Inspect only the useful portion of Live Scripts before the line beginning `%[appendix]`.
 2. Call `paths = setupExercise3()` and load/validate the supplied baseline. Use `paths.BaselineScript` for the original script and `paths.HelperFunctionsFolder` for its supporting code. Setup requires no generated solution files.
 3. Run `paths.RadarFile` and capture `radar`.
 4. Adapt `radar` for Exercise 3 spherical detections with elevation and range-rate support.
