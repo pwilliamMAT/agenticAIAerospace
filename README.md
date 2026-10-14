@@ -1,31 +1,87 @@
 # Note for github versus gitlab:
 I setup github as the customer-facing, clean version of the repo and the gitlab as the development version.
 Copilot suggested the below steps to use in the future when developing so that we can keep customer gitub clean.
+## Repository Setup
 
-## Github repo:
-https://github.com/pwilliamMAT/agenticAIAerospace
+This project uses two repositories:
 
-## Repository Workflow
+- GitLab is the development repository.
+- GitHub is the clean, customer-facing repository.
 
-GitLab is the development repository for this project.
+Development branches, experiments, and incomplete work should remain in GitLab.
+Only approved customer-facing `main` should be published to GitHub.
 
-- `origin` → GitLab (development)
-- `github` → GitHub (customer-facing release)
+### First-Time Developer Setup
 
-Development branches and incomplete work remain in GitLab.
-Only customer-ready content on `main` should be published to GitHub.
+Clone the development repository from GitLab:
 
-### Initial setup
+    git clone <GITLAB-REPOSITORY-URL>
+    cd agenticaiaerospace
 
-git clone <GitLab repo>
-cd agenticaiaerospace
-git remote add github <GitHub repo>
+The GitLab repository will automatically be configured as `origin`.
 
-### Normal development
+Add the customer-facing GitHub repository as a second remote:
 
-git pull
-git push
+    git remote add github <GITHUB-REPOSITORY-URL>
 
-### Publish customer-ready main
+Verify the configuration:
 
-git switch main
+    git remote -v
+
+You should see:
+
+    origin  <GITLAB-REPOSITORY-URL> (fetch)
+    origin  <GITLAB-REPOSITORY-URL> (push)
+    github  <GITHUB-REPOSITORY-URL> (fetch)
+    github  <GITHUB-REPOSITORY-URL> (push)
+
+Verify that `main` tracks GitLab:
+
+    git branch -vv
+
+The `main` branch should show `origin/main` as its upstream.
+
+If necessary, set it explicitly:
+
+    git branch --set-upstream-to=origin/main main
+
+
+## Normal Development
+
+GitLab is the normal development remote.
+
+Update `main`:
+
+    git switch main
+    git pull
+
+Create development branches as needed:
+
+    git switch -c feature/my-change
+
+Push development work to GitLab:
+
+    git push -u origin feature/my-change
+
+Do not push development branches to GitHub.
+
+
+## Publishing a Customer-Ready Version
+
+Once approved changes have been merged into GitLab `main`:
+
+    git switch main
+    git pull origin main
+
+Verify and test the customer-facing content.
+
+Then publish `main` explicitly to GitHub:
+
+    git push github main
+
+Do not use:
+
+    git push --all github
+    git push --mirror github
+
+GitHub should contain only the intentionally published customer-facing content.
