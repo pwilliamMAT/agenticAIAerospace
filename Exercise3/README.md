@@ -7,7 +7,7 @@ This folder is the customer starting point for an agentic MATLAB workshop. Your 
 ```text
 Exercise3/
   README.md
-Exercise3Prompt.md
+  Exercise3Prompt.md
   agentChecks.md
   setupExercise3.m
   Exercise3_WideAreaSurveillance.m
@@ -20,8 +20,6 @@ Exercise3Prompt.md
     helperLoadExercise3Baseline.m
     prepareExercise3Baseline.m
     dWideAreaSurveillanceTargetWaypoints.mat
-  tests/
-    exercise3BaselineTest.m
 ```
 
 The original Live Script is the simulation to inspect. `helperFunctions/` contains its supporting code, scenario data, baseline loader, and an author preparation utility. Keep the baseline MAT-file at the exercise root so it can be opened and inspected directly.
@@ -114,10 +112,10 @@ An existing baseline is protected. Explicit regeneration uses `prepareExercise3B
 From the repository root:
 
 ```matlab
-results = runtests(fullfile("Exercise3", "tests", "exercise3BaselineTest.m"));
+results = runtests(fullfile("Exercise3_Test3", "tests", "exercise3BaselineTest.m"));
 assertSuccess(results)
 ```
 
-These distribution checks require only supplied starter files and the Exercise 2 radar input. They verify startup without a solution, required-file diagnostics, helper resolution, baseline protection, preparation in a disposable short-scenario copy, and relocation. They intentionally require the published starter to remain free of generated solution files.
+These author-only distribution checks live in the Git-ignored local rehearsal folder and target the sibling `Exercise3` starter. They verify startup without a solution, required-file diagnostics, helper resolution, baseline protection, preparation in a disposable short-scenario copy, and relocation. They intentionally require the published starter to remain free of generated solution files and a `tests` folder. Customers do not need these tests or the rehearsal folder to complete the exercise.
 
-Completed-solution tests live separately in the ignored `Exercise3_Test3/tests/` folder. MATLAB Online execution and browser-window layout still need verification in a signed-in session.
+The same local `Exercise3_Test3/tests/` folder also holds the completed-solution tests, which target the local rehearsal copy. See its README for running both suites. MATLAB Online execution and browser-window layout still need verification in a signed-in session.
