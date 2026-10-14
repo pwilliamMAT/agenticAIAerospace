@@ -2,6 +2,9 @@
 %[text] This live script runs a wide-area surveillance baseline with three stationary ground radars and two airborne radars. The code below is based on [this documentation example](https://www.mathworks.com/help/fusion/ug/wide-area-surveillance-using-radars-example.html), reformatted to expose the radar object at the top level.
 %[text] ![](text:image:5100)
 %%
+%[text] ## Setup
+exercise3Paths = setupExercise3();
+%%
 %[text] ## Build the Original Ground-Radar Model
 %[text] Configure Radar Parameters
 updateRate = 1;

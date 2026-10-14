@@ -11,6 +11,8 @@ classdef exercise3BaselineTest < matlab.unittest.TestCase
             testCase.addTeardown(@() path(previousPath));
             testCase.addTeardown(@() rng(previousRandomStream));
             exercise3Folder = fileparts(fileparts(mfilename("fullpath")));
+            testCase.applyFixture(matlab.unittest.fixtures.CurrentFolderFixture( ...
+                fileparts(exercise3Folder)));
             addpath(exercise3Folder);
             testCase.Paths = setupExercise3();
         end
@@ -20,10 +22,12 @@ classdef exercise3BaselineTest < matlab.unittest.TestCase
         function setupBeforeAnySolutionExists(testCase)
             testCase.applyFixture(matlab.unittest.fixtures.CurrentFolderFixture( ...
                 fileparts(testCase.Paths.Exercise3Folder)));
-            generatedFiles = ["Exercise3_CharacterizedWideAreaSurveillance.m", ...
-                "helperRunWideAreaSurveillanceTrackingWithComparison.m", ...
-                "exercise3_characterized_ospa_comparison.png"];
-            testCase.assertFalse(any(isfile(fullfile(testCase.Paths.Exercise3Folder, generatedFiles))), ...
+            generatedFiles = [fullfile(testCase.Paths.Exercise3Folder, ...
+                "Exercise3_CharacterizedWideAreaSurveillance.m"), ...
+                fullfile(testCase.Paths.HelperFunctionsFolder, ...
+                "helperRunWideAreaSurveillanceTrackingWithComparison.m"), ...
+                fullfile(testCase.Paths.Exercise3Folder, "exercise3_characterized_ospa_comparison.png")];
+            testCase.assertFalse(any(isfile(generatedFiles)), ...
                 "The distributed starter must not contain generated solution files.");
             beforeFiles = dir(fullfile(testCase.Paths.Exercise3Folder, "**", "*"));
             previousFolder = pwd;
@@ -32,6 +36,11 @@ classdef exercise3BaselineTest < matlab.unittest.TestCase
             paths = setupExercise3();
             testCase.verifyTrue(isfile(paths.BaselineScript));
             testCase.verifyTrue(isfile(paths.PromptFile));
+            testCase.verifyTrue(isfile(paths.AgentChecksFile));
+            testCase.verifyTrue(isfolder(paths.HelperFunctionsFolder));
+            testCase.verifyEqual(string(fileparts(paths.WaypointFile)), paths.HelperFunctionsFolder);
+            testCase.verifyEmpty(dir(fullfile(paths.Exercise3Folder, "helper*.m")));
+            testCase.verifyFalse(isfile(fullfile(paths.Exercise3Folder, "prepareExercise3Baseline.m")));
             testCase.verifyTrue(isfile(paths.BaselineFile));
             testCase.verifyTrue(isfile(paths.RadarFile));
             testCase.verifyEqual(pwd, previousFolder);
@@ -55,6 +64,10 @@ classdef exercise3BaselineTest < matlab.unittest.TestCase
                 "scenario.StopTime = 2;");
             writelines(source, sourceFile);
             testCase.applyFixture(matlab.unittest.fixtures.CurrentFolderFixture(copiedExercise3));
+            pathBeforeCopySetup = path;
+            testCase.addTeardown(@() path(pathBeforeCopySetup));
+            clear prepareExercise3Baseline setupExercise3
+            setupExercise3();
             previousFigures = findall(groot, "Type", "figure");
             previousRandomStream = rng;
             previousPath = path;
@@ -67,6 +80,21 @@ classdef exercise3BaselineTest < matlab.unittest.TestCase
             testCase.verifyEqual(rng, previousRandomStream, AbsTol=0);
             testCase.verifyEqual(path, previousPath);
             testCase.verifyEqual(string(fileparts(file)), string(copiedExercise3));
+            helperSources = string({metadata.Sources(2:end).File});
+            testCase.verifyTrue(all(startsWith(helperSources, "helperFunctions" + filesep)));
+            testCase.verifyTrue(all(isfile(fullfile(copiedExercise3, helperSources))));
+        end
+
+        function missingSuppliedHelperFailsBeforePathChanges(testCase)
+            folder = testCase.applyFixture(matlab.unittest.fixtures.TemporaryFolderFixture);
+            copiedExercise3 = fullfile(folder.Folder, "Exercise3");
+            copyfile(testCase.Paths.Exercise3Folder, copiedExercise3);
+            delete(fullfile(copiedExercise3, "helperFunctions", "helperPlotSensorData.m"));
+            testCase.applyFixture(matlab.unittest.fixtures.CurrentFolderFixture(copiedExercise3));
+            previousPath = path;
+            clear setupExercise3
+            testCase.verifyError(@() setupExercise3(), "Exercise3:MissingInput");
+            testCase.verifyEqual(path, previousPath);
         end
 
         function loadFullBaselineWithoutGraphics(testCase)
@@ -154,6 +182,22 @@ classdef exercise3BaselineTest < matlab.unittest.TestCase
             testCase.verifyEqual(scene.StopTime, 100, AbsTol=0);
             testCase.verifyGreaterThan(numel(scene.Platforms), 5);
 
+            % The original Live Script must bootstrap its own helper subfolder.
+            source = string(fileread(relocatedPaths.BaselineScript));
+            source = replace(source, ...
+                "scenario = helperCreateWideAreaSurveillanceScenario(groundRadar);", ...
+                "scenario = helperCreateWideAreaSurveillanceScenario(groundRadar);" + newline + ...
+                "scenario.StopTime = 2;");
+            writelines(source, relocatedPaths.BaselineScript);
+            previousFigures = findall(groot, "Type", "figure");
+            testCase.addTeardown(@() closeNewFigures(previousFigures));
+            rmpath(relocatedPaths.HelperFunctionsFolder);
+            rmpath(testCase.Paths.HelperFunctionsFolder);
+            clear setupExercise3 helperCreateWideAreaSurveillanceScenario helperRunWideAreaSurveillanceTracking
+            run(relocatedPaths.BaselineScript);
+            testCase.verifyEqual(baselineResults.Time, (0:2)', AbsTol=0);
+            testCase.verifyEqual(string(which("helperCreateWideAreaSurveillanceScenario")), ...
+                fullfile(relocatedPaths.HelperFunctionsFolder, "helperCreateWideAreaSurveillanceScenario.m"));
         end
 
         function rejectCurrentFolderHelperConflict(testCase)
