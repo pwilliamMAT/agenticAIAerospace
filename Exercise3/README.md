@@ -7,7 +7,7 @@ This folder is the customer starting point for an agentic MATLAB workshop. Your 
 ```text
 Exercise3/
   README.md
-  Exercise3Prompt_v7.md
+Exercise3Prompt.md
   agentChecks.md
   setupExercise3.m
   Exercise3_WideAreaSurveillance.m
@@ -39,7 +39,7 @@ cd("Exercise3")
 setupExercise3;
 ```
 
-Keep this exercise folder as MATLAB's Current Folder when using Live Editor Run All. Open your coding agent in the same folder and ask it to read `agentChecks.md` and follow `Exercise3Prompt_v7.md`.
+Keep this exercise folder as MATLAB's Current Folder when using Live Editor Run All. Open your coding agent in the same folder and ask it to read `agentChecks.md` and follow `Exercise3Prompt.md`.
 
 Setup checks the original script, current prompt, agent instructions, supplied helper functions, and waypoint file. It adds this copy's `helperFunctions/` and the Exercise 2 output folder to the MATLAB path and verifies helper resolution. It reports whether the supplied baseline and Exercise 2 radar input are present. Loading and validating the baseline is the next agent step.
 
