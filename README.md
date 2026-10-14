@@ -1,6 +1,10 @@
 # Note for github versus gitlab:
 I setup github as the customer-facing, clean version of the repo and the gitlab as the development version.
 Copilot suggested the below steps to use in the future when developing so that we can keep customer gitub clean.
+
+## GITHUB REPO:
+https://github.com/pwilliamMAT/agenticAIAerospace
+
 ## Repository Setup
 
 This project uses two repositories:
